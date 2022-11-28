@@ -1,5 +1,5 @@
 import typer
-from pathlib import Path, PurePath
+from pathlib import Path
 
 from printing import write_question, write_error, write_verbose
 
