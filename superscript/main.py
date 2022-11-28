@@ -1,7 +1,8 @@
 import typer
 import yaml
 import git
-import re
+from __init__ import __version__
+from helper.constants import *
 
 from pathlib import Path, PurePath
 import shutil
@@ -12,45 +13,11 @@ from rich.console import Console
 from rich.markdown import Markdown
 
 
-__version__ = "0.1.0"
-
-APP_NAME = "superscript"
-DEFAULT_CONFIG = "superconfig.yml"
 app = typer.Typer(
     help="Awesome superscript to dynamically manage your portable software components.")
 console = Console()
 state = {"verbose": False}
 superconfig = None
-
-pos = typer.style("[+] ", fg=typer.colors.GREEN, bold=True)
-inf = typer.style("[*] ", fg=typer.colors.WHITE, bold=True)
-neg = typer.style("[-] ", fg=typer.colors.RED, bold=True)
-vrb = typer.style("[~] ", fg=typer.colors.CYAN)
-qst = typer.style("[?] ", fg=typer.colors.YELLOW)
-cnt = "{}[{}] "
-
-# ssh://git@pentest-git.myatos.net:2222/Reporting/Knowledgebase.git
-GITSSH_BLUEPRINT = re.compile(
-    r'^(?:git|ssh|https?|git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$', re.IGNORECASE)
-URL_BLUEPRINT = re.compile(
-    r'^(?:http|ftp)s?://'  # http:// or https://
-    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
-    r'localhost|'  # localhost...
-    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
-    r'(?::\d+)?'  # optional port
-    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-
-UNCATEGORIZED = "(uncategorized)"
-
-GITENDING = ".git"
-GITDEFAULTBRANCH = "main"
-
-TYPES = {
-    "git": "git",
-    "gitrelease": "gitrelease",
-    "urlfile": "urlfile"
-}
-
 
 def convert_versionstring(versionstring):
     versionstring_regex = re.compile("[vV]?(?P<major>[0-9]+)[.,-_]?(?P<minor>[0-9]*)[.,-_]?(?P<fix>[0-9]*)")
@@ -105,29 +72,29 @@ def version_callback(value: bool):
 
 
 def write_success(message):
-    typer.echo(pos + message)
+    typer.echo(POS + message)
 
 
 def write_info(message):
-    typer.echo(inf + message)
+    typer.echo(INF + message)
 
 
 def write_error(message):
-    typer.echo(neg + typer.style(message, fg=typer.colors.RED))
+    typer.echo(NEG + typer.style(message, fg=typer.colors.RED))
 
 
 def write_verbose(message):
     if state["verbose"]:
-        typer.echo(vrb + message)
+        typer.echo(VRB + message)
 
 
 def write_question(message, abort=True):
-    return typer.confirm(qst + message, abort=abort)
+    return typer.confirm(QST + message, abort=abort)
 
 
 def write_count(content, counter=None, level=1):
     if counter is not None:
-        typer.echo(cnt.format(level * "    ", counter) + content)
+        typer.echo(CNT.format(level * "    ", counter) + content)
     else:
         typer.echo(level * "    " + content)
 
