@@ -1,5 +1,6 @@
 import typer
 from constants import POS, INF, NEG, VRB, QST, CNT
+from settings import Settings
 
 
 def write_success(message):
@@ -15,10 +16,8 @@ def write_error(message):
 
 
 def write_verbose(message):
-    # TODO: add global state
-    # if state["verbose"]:
-    #    typer.echo(VRB + message)
-    typer.echo(VRB + message)
+    if Settings.debug:
+        typer.echo(VRB + message)
 
 
 def write_question(message, abort=True):

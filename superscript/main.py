@@ -4,10 +4,12 @@ import git
 import re
 from typing import Dict
 from __init__ import __version__
+from helper.settings import Settings
 from helper.constants import APP_NAME, GITDEFAULTBRANCH, TYPES, \
     UNCATEGORIZED, DEFAULT_CONFIG, GITENDING, URL_BLUEPRINT, GITSSH_BLUEPRINT
 from helper.printing import write_success, write_verbose, write_error, write_info, write_question, write_count
 from helper.versioning import Version
+from helper.fshandling import check_path_create
 
 from pathlib import Path, PurePath
 import shutil
@@ -18,11 +20,8 @@ from rich.console import Console
 from rich.markdown import Markdown
 
 
-app = typer.Typer(
-    help="Awesome superscript to dynamically manage your portable software components.")
-console = Console()
-state = {"verbose": False}
-superconfig: Dict | None = None
+def callback(debug: bool = False):
+    Settings.debug = debug
 
 
 def version_callback(value: bool):
@@ -31,21 +30,17 @@ def version_callback(value: bool):
         raise typer.Exit()
 
 
+app = typer.Typer(
+    callback=callback,
+    help="Awesome superscript to dynamically manage your portable software components."
+)
+console = Console()
+state = {"verbose": False}
+superconfig: Dict | None = None
+
+
 def get_gitname(giturl):
     return giturl.rstrip("/").split("/")[-1].replace(GITENDING, "")
-
-
-def check_path_create(path, ask=False):
-    if not isinstance(path, PurePath):
-        path = Path(path)
-    if not path.is_dir():
-        if ask:
-            create_folders = write_question("The provided path {path} does currently not exist, do you want to create the neccessary folders?")
-            if not create_folders:
-                write_error(f"The provided path {path} does not exist and should not be created")
-                raise typer.Exit()
-        write_verbose(f"Creating path {path} as it does not exist")
-        Path.mkdir(path)
 
 
 def create_config(
