@@ -13,7 +13,7 @@ CNT = "{}[{}] "
 
 # ssh://git@pentest-git.myatos.net:2222/Reporting/Knowledgebase.git
 GITSSH_BLUEPRINT = re.compile(
-    r'^(?:git|ssh|https?|git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$', re.IGNORECASE)
+    r'^(?:git|ssh|https?|git@[-\w.]+):(//)?(.*?)(\.git)(/?|#[-\w._]+?)$', re.IGNORECASE)
 URL_BLUEPRINT = re.compile(
     r'^(?:http|ftp)s?://'  # http:// or https://
     r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...

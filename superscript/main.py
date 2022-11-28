@@ -1,8 +1,13 @@
 import typer
 import yaml
 import git
+import re
+from typing import Dict
 from __init__ import __version__
-from helper.constants import *
+from helper.constants import APP_NAME, GITDEFAULTBRANCH, TYPES, \
+    UNCATEGORIZED, DEFAULT_CONFIG, GITENDING, URL_BLUEPRINT, GITSSH_BLUEPRINT
+from helper.printing import write_success, write_verbose, write_error, write_info, write_question, write_count
+from helper.versioning import Version
 
 from pathlib import Path, PurePath
 import shutil
@@ -17,86 +22,13 @@ app = typer.Typer(
     help="Awesome superscript to dynamically manage your portable software components.")
 console = Console()
 state = {"verbose": False}
-superconfig = None
-
-def convert_versionstring(versionstring):
-    versionstring_regex = re.compile("[vV]?(?P<major>[0-9]+)[.,-_]?(?P<minor>[0-9]*)[.,-_]?(?P<fix>[0-9]*)")
-    version_match = versionstring_regex.match(versionstring.strip())
-    if not version_match:
-        # TODO: handle error in regex and print versionstring with the info that this version conversion is not supported at the moment
-        pass
-    version = {
-        'major': 0,
-        'minor': 0,
-        'fix': 0
-    }
-    if version_match.group('major'):
-        version['major'] = int(version_match.group('major'))
-        if version_match.group('minor'):
-            version['minor'] = int(version_match.group('minor'))
-            if version_match.group('fix'):
-                version['fix'] = int(version_match.group('fix'))
-    return version
-
-
-class Version():
-    def __init__(self, *args, **kwargs):
-        default_version = {
-            'major': 0,
-            'minor': 0,
-            'fix': 0
-        }
-        if len(args) == 1:
-            default_version = convert_versionstring(args[0])
-        self.major = kwargs.get('major', default_version['major'])
-        self.minor = kwargs.get('minor', default_version['minor'])
-        self.fix = kwargs.get('fix', default_version['fix'])
-
-    def get_versionstring(self):
-        return "v{}.{}.{}".format(self.major, self.minor, self.fix)
-
-    def next_major(self):
-        return int(self.major) + 1
-
-    def next_minor(self):
-        return int(self.minor) + 1
-
-    def next_fix(self):
-        return int(self.fix) + 1
+superconfig: Dict | None = None
 
 
 def version_callback(value: bool):
     if value:
         typer.echo(f"superscript Version: {__version__}")
         raise typer.Exit()
-
-
-def write_success(message):
-    typer.echo(POS + message)
-
-
-def write_info(message):
-    typer.echo(INF + message)
-
-
-def write_error(message):
-    typer.echo(NEG + typer.style(message, fg=typer.colors.RED))
-
-
-def write_verbose(message):
-    if state["verbose"]:
-        typer.echo(VRB + message)
-
-
-def write_question(message, abort=True):
-    return typer.confirm(QST + message, abort=abort)
-
-
-def write_count(content, counter=None, level=1):
-    if counter is not None:
-        typer.echo(CNT.format(level * "    ", counter) + content)
-    else:
-        typer.echo(level * "    " + content)
 
 
 def get_gitname(giturl):
@@ -162,6 +94,7 @@ def save_superconfig(
     global superconfig
     check_path_create(path.parent)
     if superconfig["config"]["gitvcs"]:
+        repo: git.Repo
         if initializerepo:
             # proof if a git repo already exists and delete if user accepts
             gitpath = path.parent / GITENDING
@@ -278,7 +211,7 @@ def main(
     autosave: bool = True,
     verbose: bool = False,
     version: bool = typer.Option(
-        None, "--version", callback=version_callback, is_eager=True
+        None, "--version", "-V", callback=version_callback, is_eager=True
     )
 ):
     """
@@ -457,7 +390,7 @@ def urlfile(
     name_version_ending_string = fileurl.rsplit("/", 1)[1]
     name, version_ending_string = name_version_ending_string.split("_", 1)
     version_string, ending = version_ending_string.rsplit(".", 1)
-    version = convert_versionstring(version_string)
+    version = Version.convert_versionstring(version_string)
     print(name, version, ending)
     file = requests.get(fileurl)
     # last_updated = now()
@@ -471,7 +404,7 @@ def urlfile(
             check_path_create(custompath, ask=True)
             basepath = custompath
         # save file to corresponding path
-        with open(basepath / name_version_ending_string, "w+") as downloadfile:
+        with open(basepath / name_version_ending_string, "wb+") as downloadfile:
             downloadfile.write(file.content)
 
         # add component to config file
@@ -627,7 +560,7 @@ def restore(
     if installpath is None:
         # installpath = superconfig["defaultpath"]
         pass
-    tools, = get_all_tools()
+    tools, _ = get_all_tools()
     for i, tool in enumerate(tools):
         toolconfig, category = get_toolconfig(tool)
         # rearrange if conditions
@@ -642,7 +575,7 @@ def restore(
                     recursive = True
                 # subfolder = True if toolname in last path snippet
                 # custompath = custompath or installpath, whereas installpath is more important
-                clone(toolconfig["url"], branch, recursive, category, installpath)
+                clone(toolconfig["url"], branch, recursive, category, custompath=installpath)
                 pass
         else:
             pass
