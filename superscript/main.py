@@ -43,6 +43,7 @@ URL_BLUEPRINT = re.compile(
 UNCATEGORIZED = "(uncategorized)"
 
 GITENDING = ".git"
+GITDEFAULTBRANCH = "main"
 
 TYPES = {
     "git": "git",
@@ -99,7 +100,7 @@ class Version():
 
 def version_callback(value: bool):
     if value:
-        typer.echo(f"Awesome CLI Version: {__version__}")
+        typer.echo(f"superscript Version: {__version__}")
         raise typer.Exit()
 
 
@@ -266,7 +267,7 @@ def add_component(
     component_name,
     component_url,
     component_path,
-    branch="master",
+    branch=GITDEFAULTBRANCH,
     recursive=False,
     subfolder=True,
     custompath=None,
@@ -280,8 +281,8 @@ def add_component(
     addition = {component_name: {"url": component_url, "type": component_type}}
     if (category != UNCATEGORIZED and not subfolder) or custompath:
         addition[component_name].update({"custompath": str(component_path)})
-    # save branch if it is not master
-    if branch != "master":
+    # save branch if it is not  (default branch name)
+    if branch != GITDEFAULTBRANCH:
         addition[component_name].update({"branch": branch})
 
     if recursive:
@@ -349,7 +350,7 @@ def main(
 @app.command()
 def clone(
     giturl: str,
-    branch: str = "master",
+    branch: str = GITDEFAULTBRANCH,
     recursive: bool = False,
     category: str = UNCATEGORIZED,
     subfolder: bool = True,
@@ -666,7 +667,7 @@ def restore(
         if "custompath" in toolconfig:
             if toolconfig["type"] == TYPES["git"]:
                 # clone to custom path
-                branch = "master"
+                branch = GITDEFAULTBRANCH
                 recursive = False
                 if "branch" in toolconfig:
                     branch = toolconfig["branch"]
