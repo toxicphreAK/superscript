@@ -1,0 +1,11 @@
+README.md
+setup.py
+superscript/__init__.py
+superscript/__main__.py
+superscript/main.py
+superscript.egg-info/PKG-INFO
+superscript.egg-info/SOURCES.txt
+superscript.egg-info/dependency_links.txt
+superscript.egg-info/entry_points.txt
+superscript.egg-info/requires.txt
+superscript.egg-info/top_level.txt

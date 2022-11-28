@@ -1,0 +1,3 @@
+[console_scripts]
+superscript = superscript.main:app
+

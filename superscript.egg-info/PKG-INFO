@@ -1,0 +1,14 @@
+Metadata-Version: 1.2
+Name: superscript
+Version: 0.1.0
+Summary: Dynamical software components manager.
+Home-page: UNKNOWN
+Author: Alexander Küppers
+Author-email: pentesting.laboratories@gmail.com
+License: UNKNOWN
+Description: # superscript
+        
+        Awesome superscript to dynamically manage your software components.
+        
+Platform: UNKNOWN
+Requires-Python: >=3.8,<4.0
