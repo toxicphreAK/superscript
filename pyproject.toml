@@ -4,7 +4,7 @@ version = "0.1.1"
 description = "Dynamical software components manager."
 authors = ["toxicphreAK <pentesting.laboratories@gmail.com>"]
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Environment :: Console",
