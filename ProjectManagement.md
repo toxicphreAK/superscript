@@ -73,6 +73,9 @@ superscript gitrelease https://github.com/user/SSF pre-release
 superscript pip roadrecon
 
 superscript urlfile https://server/path/file.ending
+
+# $version in download will be replaced by previously grepped version from req response
+superscript cascadedfile --req https://server/getVersion.html --grep "ToolName (?P<version>\d{3})" --download https://server/tool$version.7z
 ```
 
 ```bash
